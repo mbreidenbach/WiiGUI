@@ -18,10 +18,25 @@
 static u32 *xfb;
 static GXRModeObj *rmode;
 
+JPEGIMG cursor;
+extern char cursordata[];
+extern int cursorlength;
+
+void PictureInit(){
+    memset(&cursor, 0, sizeof(JPEGIMG));
+
+    cursor.inbuffer = cursordata;
+    cursor.inbufferlength = cursorlength;
+
+    JPEG_Decompress(&cursor);
+}
+
+
 void Init(){
 
 	VIDEO_Init();
 	PAD_Init();
+	PictureInit();
 
 	rmode = VIDEO_GetPreferredMode(NULL);
 
@@ -35,6 +50,7 @@ void Init(){
 	VIDEO_WaitVSync();
 	if(rmode -> viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
 }
+
 
 void DrawHLine(int x1, int x2, int y, int color){
 	int i;
@@ -63,16 +79,30 @@ void DrawBox(int x1, int y1, int x2, int y2, int color){
 	DrawVLine(x2, y1, y2, color);
 }
 
-void DrawPictureCursor(int x, int y, JPEGIMG img){
+void DisplayJPEG(JPEGIMG jpeg, int x, int y) {
 
+    unsigned int *jpegout = (unsigned int *) jpeg.outbuffer;
+
+    int i,j;
+    int height = jpeg.height;
+    int width = jpeg.width / 2;
+    for(i=0;i<=width;i++)
+        for(j=0;j<=height-2;j++)
+            xfb[(i+x)+320*(j+16+y)]=jpegout[i+width*j];
+}
+
+
+void DrawPictureCursor(int x, int y, JPEGIMG img){
+    DisplayJPEG(img, x, y);
 }
 
 
 int main(){
 	Init();
 
-	int cursorPosX = 100;
-	int cursorPosY = 100;
+
+	int cursorPosX = 220;
+	int cursorPosY = 160;
 
 	while(1){
 
@@ -102,7 +132,10 @@ int main(){
 		}
 
 		//dot cursor
-		DrawBox(cursorPosX, cursorPosY, cursorPosX + 1, cursorPosY + 1, COLOR_WHITE);
+		//DrawBox(cursorPosX, cursorPosY, cursorPosX + 1, cursorPosY + 1, COLOR_WHITE);
+
+		//img cursor
+		DrawPictureCursor(cursorPosX, cursorPosY, cursor);
 
 		VIDEO_WaitVSync();
 	}
