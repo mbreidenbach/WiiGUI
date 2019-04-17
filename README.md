@@ -10,6 +10,14 @@ Nintendo Wii homebrew app built using DevKitPro libraries.
 
 ## Versions
 All progress that has been made on the design.
+### v3.0 and v4.0: Controller Input
+- Why the hell didnt I write v3.0 already
+- All upper GC Controller buttons (so not d-pad and c-stick) mapped and will show on screen.
+- A and Home buttons on Wii Controller detect press, hold, and release.
+- Found out the Wii can and will dump its stack if you dont initialize controller properly
+  - or if you set two controllers to the same input (p0, p1, etc)
+    - that took way too long to debug
+
 ### v2.0: JPEG's
 - New Functions!
   - PictureInit
