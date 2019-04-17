@@ -52,7 +52,11 @@ main.o: C:/devkitPro/examples/gamecube/WiiGUI/source/main.c \
  C:/devkitPro/libogc/include/ogc/system.h \
  C:/devkitPro/libogc/include/ogc/wiilaunch.h \
  C:/devkitPro/libogc/include/fat.h \
- C:/devkitPro/libogc/include/libfatversion.h
+ C:/devkitPro/libogc/include/libfatversion.h \
+ C:/devkitPro/libogc/include/wiiuse/wpad.h \
+ C:/devkitPro/libogc/include/wiiuse/wiiuse.h \
+ C:/devkitPro/libogc/include/bte/bte.h \
+ C:/devkitPro/libogc/include/bte/bd_addr.h
 
 C:/devkitPro/libogc/include/ogcsys.h:
 
@@ -161,3 +165,11 @@ C:/devkitPro/libogc/include/ogc/wiilaunch.h:
 C:/devkitPro/libogc/include/fat.h:
 
 C:/devkitPro/libogc/include/libfatversion.h:
+
+C:/devkitPro/libogc/include/wiiuse/wpad.h:
+
+C:/devkitPro/libogc/include/wiiuse/wiiuse.h:
+
+C:/devkitPro/libogc/include/bte/bte.h:
+
+C:/devkitPro/libogc/include/bte/bd_addr.h:
