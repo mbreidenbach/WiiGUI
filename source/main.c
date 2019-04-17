@@ -17,12 +17,18 @@
 //controller testing
 //target shooting
 
+//Video Globals
 static u32 *xfb;
 static GXRModeObj *rmode;
 
+//JPEG Globals
 JPEGIMG cursor;
 extern char cursordata[];
 extern int cursorlength;
+
+//IR Wii Cont. Global
+ir_t ir;
+
 
 /**
  * Initializes Picture data
@@ -43,7 +49,12 @@ void Init(){
 
 	VIDEO_Init();
 	PAD_Init();
+
 	WPAD_Init();
+	WPAD_SetVRes(0, 640, 480);
+	WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
+
+
 	PictureInit();
 
 	rmode = VIDEO_GetPreferredMode(NULL);
@@ -145,10 +156,7 @@ int main(){
 	int cursorPosX = 220;
 	int cursorPosY = 160;
 
-	bool ClearFrame = false;
-	//controls what input i want to use for the dol make (stack will
-	//dump if both types of inputs are trying to be noticed)
-	bool gcControllerInput = true;
+	bool ClearFrame = true;
 
 	while(1){
 
@@ -157,51 +165,50 @@ int main(){
         }
 
 	    //GAMECUBE INPUT
-	    if (gcControllerInput) {
-            PAD_ScanPads();
+        PAD_ScanPads();
 
-            //Are any buttons on controller 1 (port #2) being pressed?
-            u16 buttonDown = PAD_ButtonsDown(1);
-            u16 buttonHeld = PAD_ButtonsHeld(1);
-            u16 buttonUp = PAD_ButtonsUp(1);
+        //Are any buttons on controller 1 (port #2) being pressed?
+        u16 buttonDown = PAD_ButtonsDown(1);
+        u16 buttonHeld = PAD_ButtonsHeld(1);
+        u16 buttonUp = PAD_ButtonsUp(1);
 
-            if (PAD_StickY(1) > 18) {
-                cursorPosY--;
-            }
-            if (PAD_StickY(1) < -18) {
-                cursorPosY++;
-            }
-            if (PAD_StickX(1) > 18) {
-                cursorPosX++;
-            }
-            if (PAD_StickX(1) < -18) {
-                cursorPosX--;
-            }
-            if (PAD_BUTTON_START & buttonDown) {
-                exit(0);
-            }
-            if (PAD_BUTTON_A & buttonDown) {
-                printf("a \n");
-            }
-            if (PAD_BUTTON_B & buttonDown) {
-                printf("b \n");
-            }
-            if (PAD_BUTTON_X & buttonDown) {
-                printf("x \n");
-            }
-            if (PAD_BUTTON_Y & buttonDown) {
-                printf("y \n");
-            }
-            if (PAD_TRIGGER_Z & buttonDown) {
-                printf("z \n");
-            }
-            if (PAD_TRIGGER_L & buttonDown) {
-                printf("LTRIG  \n");
-            }
-            if (PAD_TRIGGER_R & buttonDown) {
-                printf("RTRIG  \n");
-            }
-            // code not working: idk how to properly call for c-stick inputs
+        if (PAD_StickY(1) > 18) {
+            cursorPosY--;
+        }
+        if (PAD_StickY(1) < -18) {
+            cursorPosY++;
+        }
+        if (PAD_StickX(1) > 18) {
+            cursorPosX++;
+        }
+        if (PAD_StickX(1) < -18) {
+            cursorPosX--;
+        }
+        if (PAD_BUTTON_START & buttonDown) {
+            exit(0);
+        }
+        if (PAD_BUTTON_A & buttonDown) {
+            printf("a \n");
+        }
+        if (PAD_BUTTON_B & buttonDown) {
+            printf("b \n");
+        }
+        if (PAD_BUTTON_X & buttonDown) {
+            printf("x \n");
+        }
+        if (PAD_BUTTON_Y & buttonDown) {
+            printf("y \n");
+        }
+        if (PAD_TRIGGER_Z & buttonDown) {
+            printf("z \n");
+        }
+        if (PAD_TRIGGER_L & buttonDown) {
+            printf("LTRIG  \n");
+        }
+        if (PAD_TRIGGER_R & buttonDown) {
+            printf("RTRIG  \n");
+        }
+        // code not working: idk how to properly call for c-stick inputs
 //        if (PAD_SubstickY(0) > 18){
 //            printf("subUP");
 //        }
@@ -214,42 +221,54 @@ int main(){
 //        if (PAD_SubstickX(0) > 18 ){
 //            printf("subRIGHT");
 //        }
-            if (PAD_TRIGGER_L & buttonDown) {
-                printf("trigL  \n");
-            }
-            if (PAD_TRIGGER_R & buttonDown) {
-                printf("trigR  \n");
-            }
+        if (PAD_TRIGGER_L & buttonDown) {
+            printf("trigL  \n");
+        }
+        if (PAD_TRIGGER_R & buttonDown) {
+            printf("trigR  \n");
         }
 
-	    //if (!gcControllerInput) {}
-            //WII INPUT
-            WPAD_ScanPads();
+        //WII INPUT
+        WPAD_ScanPads();
 
-            u32 buttonDownW = WPAD_ButtonsDown(WPAD_CHAN_0);
-            u32 buttonHeldW = WPAD_ButtonsHeld(WPAD_CHAN_0);
-            u32 buttonUpW = WPAD_ButtonsUp(WPAD_CHAN_0);
+        u32 buttonDownW = WPAD_ButtonsDown(WPAD_CHAN_0);
+        u32 buttonHeldW = WPAD_ButtonsHeld(WPAD_CHAN_0);
+        u32 buttonUpW = WPAD_ButtonsUp(WPAD_CHAN_0);
 
-
-            if (buttonDownW & WPAD_BUTTON_A) {
-                printf("WiiA\n");
-            }
-            if (buttonHeldW & WPAD_BUTTON_A) {
-                printf("WiiA Held\n");
-            }
-            if (buttonUpW & WPAD_BUTTON_A) {
-                printf("WiiAReleased\n");
-            }
-            if (buttonDownW & WPAD_BUTTON_HOME) {
-                exit(0);
-            }
+        //IR Sensor for Cont. 0 (p1)
+        WPAD_IR(0, &ir);
+        //will make the cursor move to IR position if IR is detected
+        if (ir.valid) {
+            cursorPosX = ir.x;
+            cursorPosY = ir.y;
+        }
 
 
-		//dot cursor
+        if (buttonDownW & WPAD_BUTTON_A) {
+            printf("WiiA\n");
+        }
+        if (buttonHeldW & WPAD_BUTTON_A) {
+            printf("WiiA Held\n");
+        }
+        if (buttonUpW & WPAD_BUTTON_A) {
+            printf("WiiAReleased\n");
+        }
+        if (buttonDownW & WPAD_BUTTON_HOME) {
+            exit(0);
+        }
+
+
+		//dot cursor (can be overwritten by IR)
 		//DrawBox(cursorPosX, cursorPosY, cursorPosX + 1, cursorPosY + 1, COLOR_WHITE);
 
-		//img cursor
-		//DrawPictureCursor(cursorPosX, cursorPosY, cursor);
+		//img cursor (can be overwritten by IR)
+		DrawPictureCursor(cursorPosX, cursorPosY, cursor);
+
+		//ir dot cursor
+        //DrawBox (ir.x, ir.y, ir.x+1, ir.y+1, COLOR_WHITE);
+
+        //ir img cursor
+        //DrawPictureCursor(ir.x, ir.y, cursor);
 
 		VIDEO_WaitVSync();
 	}
