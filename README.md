@@ -10,6 +10,14 @@ Nintendo Wii homebrew app built using DevKitPro libraries.
 
 ## Versions
 All progress that has been made on the design.
+### v5.0:
+- Removed useless code snippets (I was misimforned on how controller input was handled with 2+ controllers)
+- Wii Controller can now control the cursor using IR sensor!
+  - Code can detect if input is from IR or GC Stick, even after program init. (IR will overpower GC)
+- Code now has some commented out function calls
+  - Eventually I want to make it so that you can switch between "modes" of the cursor but for right now dol has to be remade for it to apply
+- Docstrings on functions I forgot about.
+
 ### v3.0 and v4.0: Controller Input
 - Why the hell didnt I write v3.0 already
 - All upper GC Controller buttons (so not d-pad and c-stick) mapped and will show on screen.
