@@ -2,11 +2,24 @@
 Nintendo Wii homebrew app built using DevKitPro libraries.
 
 ## In This Repo
-
+This repo contains all files used to maintain, compile, and run the application.
+- Source Folder
+  - Includes main.c and all .s files for Image Declaration
+- Include Folder
+  - All Images
+- Makefile
+  - NOT made by me. Template found from CodeMii tutorial and based from generic DKP makefile.
+- .DOL and .elf Files
+  - The application itself
 ## How to Use
-
+- To Use the Application (Assuming you have homebrew set up on your Wii)
+  - Put the .DOL file into a new folder. Rename the .DOL file to "boot" and place the folder in /apps on your SD card.
 ## Future Plans
-
+- Working GUI
+- Connect 4
+- Tic Tac Toe
+- Target Shooting
+- Cursor Selection
 
 ## Versions
 All progress that has been made on the design.
